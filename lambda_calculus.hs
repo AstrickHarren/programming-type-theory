@@ -1,5 +1,6 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
+import Data.Maybe (fromJust)
 import Data.Set (Set, delete, difference, elemAt, empty, fromList, member, singleton, union)
 
 alphaBet :: Set String
@@ -11,8 +12,9 @@ data Type
   = RawType String
   | DType Type Term --  φM
   | UniType Var Type Type -- ∀x: φ.φ
+  deriving (Eq)
 
-data Term = VarTerm Var | Lambda Var Type Term | Applied Term Term
+data Term = VarTerm Var | Lambda Var Type Term | Applied Term Term deriving (Eq)
 
 type Context = [(Var, Type)]
 
@@ -58,3 +60,11 @@ typeSub t@(UniType y phi m) x n
           (typeSub (typeSub phi y (VarTerm z)) x n)
           (typeSub (typeSub m y (VarTerm z)) x n)
   | otherwise = UniType y (typeSub phi x n) (typeSub m x n)
+
+typeOf :: Context -> Term -> Type
+typeOf ctx (VarTerm v) = fromJust $ lookup v ctx
+typeOf ctx (Applied m n) = case typeOf ctx m of
+  UniType x s t -> if typeOf ctx n == s then typeSub t x n else error "type check error: wrong application"
+  _ -> error "type check error"
+typeOf ctx (Lambda x s m) = UniType x s (typeOf ((x, s) : ctx) m)
+
