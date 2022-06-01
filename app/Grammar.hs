@@ -13,6 +13,7 @@ data Term
   | Applied Term Term -- MN
   | Pair Term Term -- (x, y)
   | OneOf Type Type (Either Term Term) -- left_ϕ∨ψ(x)
+  | Case Term (Var, Term) (Var, Term) -- case(L; x.M; y.N)
 
 -- Types
 data Type
@@ -51,3 +52,15 @@ instance Show Term where
   show (OneOf ϕ ψ m) = case m of
     Left n -> show n
     Right n -> show n
+  show (Case l (x, m) (y, n)) =
+    "case ("
+      ++ show l
+      ++ "; "
+      ++ show x
+      ++ "."
+      ++ show m
+      ++ "; "
+      ++ show y
+      ++ "."
+      ++ show n
+      ++ ")"
