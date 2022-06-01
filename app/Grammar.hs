@@ -8,7 +8,7 @@ data TypedVar = TypedVar Var Type
 
 -- Lambda calculus
 data Term
-  = Term String -- x
+  = Term Var -- x
   | Lambda TypedVar Term -- λx:α.M
   | Applied Term Term -- MN
   | Pair Term Term -- (x, y)
