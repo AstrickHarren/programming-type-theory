@@ -36,7 +36,10 @@ instance Show Term where
 instance Show Type where
   show (RawType s) = s
   show (DType s m) = show s ++ show m
-  show (UniType v s t) = "∀" ++ v ++ ":" ++ show s ++ "." ++ show t
+  show (UniType v s t) =
+    if v `member` typeFv t
+      then "∀" ++ v ++ ":" ++ show s ++ "." ++ show t
+      else show s ++ " -> " ++ show t
 
 sub :: Term -> Var -> Term -> Term
 sub term@(VarTerm v) x n = if v == x then n else term
