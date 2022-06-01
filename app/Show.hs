@@ -5,7 +5,7 @@ import FreeVar (FV (fv))
 import Grammar (Term (..), Type (..), TypedVar (..))
 
 instance Show TypedVar where
-  show (TypedVar x ϕ) = show x ++ ":" ++ show ϕ
+  show (TypedVar x ϕ) = x ++ ":" ++ show ϕ
 
 instance Show Type where
   show (Type s) = s
