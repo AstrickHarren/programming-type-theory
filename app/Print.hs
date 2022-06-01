@@ -1,4 +1,4 @@
-module Show where
+module Print where
 
 import Data.Set (member)
 import FreeVar (FV (fv))
