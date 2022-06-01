@@ -1,7 +1,9 @@
 {-# LANGUAGE UnicodeSyntax #-}
 
+import Control.Applicative (Applicative (liftA2))
 import Data.Maybe (fromJust)
 import Data.Set (Set, delete, difference, elemAt, empty, fromList, member, singleton, union)
+import Distribution.Simple.Setup (emptySDistFlags)
 
 alphaBet :: Set String
 alphaBet = fromList $ map (: []) ['a' .. 'z']
@@ -71,3 +73,80 @@ typeOf ctx (Applied m n) = case typeOf ctx m of
   _ -> error "type check error"
 typeOf ctx (Lambda x s m) = UniType x s (typeOf ((x, s) : ctx) m)
 
+----- Utilities
+
+binaryType :: Type -> Term -> Term -> Type
+binaryType s a = DType (DType s a)
+
+imply :: Type -> Type -> Type
+imply a b =
+  let z = elemAt 0 $ alphaBet `difference` (typeFv a `union` typeFv b)
+   in UniType z a b
+
+------ Test
+tSet = RawType "S"
+
+belongsTo = binaryType $ RawType "∈"
+
+isSubsetOf = binaryType $ RawType "⊂"
+
+subsetMeaning =
+  UniType
+    "x"
+    tSet
+    ( (VarTerm "x" `belongsTo` VarTerm "A")
+        `imply` (VarTerm "x" `belongsTo` VarTerm "B")
+    )
+
+defSubset =
+  UniType
+    "A"
+    tSet
+    ( UniType "B" tSet $
+        (VarTerm "A" `isSubsetOf` VarTerm "B")
+          `imply` subsetMeaning
+    )
+
+interpretSubset =
+  UniType
+    "A"
+    tSet
+    ( UniType "B" tSet $
+        subsetMeaning `imply` (VarTerm "A" `isSubsetOf` VarTerm "B")
+    )
+
+emptySet = VarTerm "∅"
+
+emptySetIsSet = ("∅", tSet)
+
+emptySetIsBottom = UniType "A" tSet (emptySet `isSubsetOf` VarTerm "A")
+
+axioms =
+  [ emptySetIsSet,
+    ("empty set is bottom", emptySetIsBottom),
+    ("interpret of subset", defSubset)
+  ]
+
+verify :: Context -> [(Type, Term)] -> Bool
+verify ctx = all (liftA2 (==) fst (typeOf ctx . snd))
+
+props = [(emptySetSubsetSelf, emptySetSubsetSelfProof), (emptySetSubsetAllMeaning, emptySetSubsetAllMeaningProof)]
+
+emptySetSubsetSelf = emptySet `isSubsetOf` emptySet
+
+emptySetSubsetSelfProof = Applied (VarTerm "empty set is bottom") emptySet
+
+emptySetSubsetAllMeaning =
+  UniType
+    "A"
+    tSet
+    ( UniType "x" tSet $
+        (VarTerm "x" `belongsTo` VarTerm "∅")
+          `imply` (VarTerm "x" `belongsTo` VarTerm "A")
+    )
+
+emptySetSubsetAllMeaningProof =
+  Lambda "A" tSet $
+    Applied
+      (Applied (Applied (VarTerm "interpret of subset") (VarTerm "∅")) (VarTerm "A"))
+      (Applied (VarTerm "empty set is bottom") (VarTerm "A"))
