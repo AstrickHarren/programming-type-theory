@@ -49,5 +49,5 @@ instance Show Term where
       ++ if length (show n) > 1 then "(" ++ show n ++ ")" else show n
   show (Pair m n) = "⟨" ++ show m ++ ", " ++ show n ++ "⟩"
   show (OneOf ϕ ψ m) = case m of
-    Left n -> "(" ++ show m ++ " as " ++ show (ϕ `Or` ψ) ++ ")"
-    Right n -> "(" ++ show m ++ " as " ++ show (ϕ `Or` ψ) ++ ")"
+    Left n -> show n
+    Right n -> show n
