@@ -26,7 +26,7 @@ fv (Applied m n) = fv m `union` fv n
 typeFv :: Type -> Set Var
 typeFv (RawType s) = empty
 typeFv (DType _ t) = fv t
-typeFv (UniType v _ t) = delete v (typeFv t)
+typeFv (UniType v s t) = delete v (typeFv s `union` typeFv t)
 
 instance Show Term where
   show (VarTerm v) = v
