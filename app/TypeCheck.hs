@@ -30,8 +30,18 @@ typeOf γ t@(Applied m n) = case typeOf γ m of
   Forall (TypedVar x ϕ) ψ ->
     if typeOf γ n == ϕ
       then sub x n ψ
-      else error $ "type check: applicant wrong type in applying " ++ show t
-  _ -> error $ "type check: not func type in applying " ++ show t
+      else
+        error $
+          "type check: applicant wrong type in applying " ++ show t ++ "\n"
+            ++ "expecting: "
+            ++ show ϕ
+            ++ ", given: "
+            ++ show (typeOf γ n)
+  _ ->
+    error $
+      "type check: not func type in applying " ++ show t ++ "\n"
+        ++ "given: "
+        ++ show (typeOf γ m)
 -- Γ ⊢ M: ϕ, Γ ⊢ N: ψ
 ----------------------
 -- Γ ⊢ ⟨M, N⟩: ϕ ∧ ψ
@@ -46,7 +56,13 @@ typeOf γ t@(OneOf ϕ ψ e) = case e of
     checkOrigin m ϕ σ =
       if typeOf γ m == ϕ
         then σ
-        else error $ "type check: type has no origin in summing " ++ show t
+        else
+          error $
+            "type check: type has no origin in summing " ++ show t ++ "\n"
+              ++ "expecting: "
+              ++ show ϕ
+              ++ ", given: "
+              ++ show (typeOf γ m)
 
 -- Γ ⊢ L: ϕ ∨ ψ   Γ, x: ϕ ⊢ M: τ  Γ, y: ψ ⊢ N: τ
 -------------------------------------------------
@@ -55,5 +71,13 @@ typeOf γ t@(Case l (x, m) (y, n)) = case typeOf γ l of
   (Or ϕ ψ) ->
     let leftType = typeOf ((x `TypedVar` ϕ) : γ) m
         rightType = typeOf ((y `TypedVar` ψ) : γ) m
-     in if leftType == rightType then leftType else error $ "type check: case branches with different types in casing: " ++ show t
+     in if leftType == rightType
+          then leftType
+          else
+            error $
+              "type check: case branches with different types in casing: " ++ show t ++ "\n"
+                ++ "left branch: "
+                ++ show leftType
+                ++ ", right branch: "
+                ++ show rightType
   _ -> error $ "type check: type not caseable in casing: " ++ show t
