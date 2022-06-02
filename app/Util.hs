@@ -8,6 +8,9 @@ import Substitute (varNotIn)
 is :: Var -> Type -> TypedVar
 is = TypedVar
 
+as :: Type -> Var -> TypedVar
+as = flip TypedVar
+
 aProofOf :: Var -> Type -> TypedVar
 aProofOf = TypedVar
 
@@ -28,3 +31,17 @@ isImpliedBy = flip implies
 
 iff :: Type -> Type -> Type
 iff a b = And (a `implies` b) (b `implies` a)
+
+-- Term related
+forany :: [TypedVar] -> Term -> Term
+forany = flip $ foldr Lambda
+
+instantiatedWith :: Term -> [Term] -> Term
+-- instantiatedWith m [] = m
+-- instantiatedWith m (x : xs) = Applied (instantiatedWith m xs) x
+instantiatedWith = foldl Applied
+
+since :: Type -> Var -> Term -> Term
+since p x = forany [x `is` p]
+
+suppose = forany
