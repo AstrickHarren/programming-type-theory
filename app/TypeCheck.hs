@@ -14,7 +14,9 @@ import Substitute (Substitute (sub))
 
 typeOf :: Context -> Term -> Type
 -- Γ, x:ϕ ⊢ x:ϕ
-typeOf γ (Term x) = fromJust $ lookup x (map asTuple γ)
+typeOf γ t@(Term x) = case lookup x (map asTuple γ) of
+  Just ϕ -> ϕ
+  Nothing -> error $ "type check: no literal term type for term: " ++ show t
   where
     asTuple (TypedVar x t) = (x, t)
 -- Γ, x: ϕ ⊢ M: ψ
