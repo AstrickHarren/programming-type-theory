@@ -29,6 +29,16 @@ implies a b =
 isImpliedBy :: Type -> Type -> Type
 isImpliedBy = flip implies
 
+infixr 1 -->
+
+(-->) :: Type -> Type -> Type
+(-->) = implies
+
+infixr 1 <--
+
+(<--) :: Type -> Type -> Type
+(<--) = isImpliedBy
+
 iff :: Type -> Type -> Type
 iff a b = And (a `implies` b) (b `implies` a)
 
