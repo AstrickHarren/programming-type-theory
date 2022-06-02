@@ -16,5 +16,8 @@ implies a b =
   let z = varNotIn (fv a `union` fv b)
    in Forall (z `TypedVar` a) b
 
+isImpliedBy :: Type -> Type -> Type
+isImpliedBy = flip implies
+
 iff :: Type -> Type -> Type
 iff a b = And (a `implies` b) (b `implies` a)
