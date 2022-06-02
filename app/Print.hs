@@ -9,6 +9,8 @@ instance Show TypedVar where
 
 instance Show Type where
   show (Type s) = s
+  -- TODO: deprecate arbitrary binary type infix printing
+  show (SuchThat (SuchThat (Type p) a) b) = show a ++ p ++ show b
   show (SuchThat ϕ m) = show ϕ ++ show m
   show (Forall x@(TypedVar v σ) ϕ) =
     if v `member` fv ϕ
