@@ -14,8 +14,8 @@ instance Show Type where
     if v `member` fv ϕ
       then "∀" ++ show x ++ "." ++ show ϕ
       else show σ ++ " -> " ++ show ϕ
-  show (And ϕ ψ) = show ϕ ++ "∧" ++ show ψ
-  show (Or ϕ ψ) = show ϕ ++ "∨" ++ show ψ
+  show (And ϕ ψ) = "(" ++ show ϕ ++ ")" ++ "∧" ++ "(" ++ show ψ ++ ")"
+  show (Or ϕ ψ) = "(" ++ show ϕ ++ ")" ++ "∨" ++ "(" ++ show ψ ++ ")"
 
 instance Show Term where
   show (Term s) = s
