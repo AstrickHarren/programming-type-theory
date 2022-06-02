@@ -9,6 +9,7 @@ import Grammar
     Type (And, Forall, Or),
     TypedVar (TypedVar),
   )
+import Identification
 import Print ()
 import Substitute (Substitute (sub))
 
