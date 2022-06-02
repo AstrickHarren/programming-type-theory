@@ -4,7 +4,7 @@ import Data.Set (Set, fromList, member)
 
 type Var = String
 
-data TypedVar = TypedVar Var Type
+data TypedVar = TypedVar Var Type deriving (Eq)
 
 -- Lambda calculus
 data Term
@@ -14,6 +14,7 @@ data Term
   | Pair Term Term -- (x, y)
   | OneOf Type Type (Either Term Term) -- left_ϕ∨ψ(x)
   | Case Term (Var, Term) (Var, Term) -- case(L; x.M; y.N)
+  deriving (Eq)
 
 -- Types
 data Type
@@ -22,6 +23,7 @@ data Type
   | Forall TypedVar Type -- ∀x:ϕ.ψ
   | And Type Type -- ϕ∧ψ
   | Or Type Type -- ϕ∨ψ
+  deriving (Eq)
 
 -- Variable alphabet
 alphaBet :: Set String
