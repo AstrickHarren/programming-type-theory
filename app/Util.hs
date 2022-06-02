@@ -5,6 +5,13 @@ import FreeVar (FV (fv))
 import Grammar
 import Substitute (varNotIn)
 
+is :: Var -> Type -> TypedVar
+is = TypedVar
+
+aProofOf :: Var -> Type -> TypedVar
+aProofOf = TypedVar
+
+-- Type related
 binaryType :: String -> Term -> Term -> Type
 binaryType p x = SuchThat (SuchThat (Type p) x)
 
