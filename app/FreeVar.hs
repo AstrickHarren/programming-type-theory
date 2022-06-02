@@ -22,6 +22,10 @@ instance FV Term where
     fv ϕ `union` fv ψ `union` case e of
       Left m -> fv m
       Right m -> fv m
+  -- FV(π1(M)) = FV(M)
+  fv (Fst m) = fv m
+  -- FV(π2(M)) == FV(M)
+  fv (Snd m) = fv m
   -- FV(case(L; x.M; y.N)) = FV(L) ∪ (FV(M) - {x}) ∪ (FV(N) - {y})
   fv (Case l (x, m) (y, n)) =
     fv l `union` delete x (fv m) `union` delete y (fv n)

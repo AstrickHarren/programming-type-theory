@@ -23,5 +23,7 @@ instance Eq Term where
   (Applied m n) == (Applied p q) = (m == p) && (n == q)
   (Pair m n) == (Pair p q) = (m == p) && (n == q)
   (OneOf a b c) == (OneOf d e f) = (a == d) && (b == e) && (c == f)
+  (Fst a) == (Fst b) = a == b
+  (Snd a) == (Snd b) = a == b
   (Case a b c) == (Case d e f) = (a == d) && (b == e) && (c == f)
   _ == _ = False

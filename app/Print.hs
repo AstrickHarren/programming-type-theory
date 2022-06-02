@@ -29,6 +29,8 @@ instance Show Term where
   show (OneOf ϕ ψ m) = case m of
     Left n -> show n
     Right n -> show n
+  show (Fst m) = "π₁" ++ show m
+  show (Snd m) = "π₂" ++ show m
   show (Case l (x, m) (y, n)) =
     "case ("
       ++ show l

@@ -13,6 +13,8 @@ data Term
   | Applied Term Term -- MN
   | Pair Term Term -- (x, y)
   | OneOf Type Type (Either Term Term) -- left_ϕ∨ψ(x)
+  | Fst Term -- π1(x)
+  | Snd Term -- π2(x)
   | Case Term (Var, Term) (Var, Term) -- case(L; x.M; y.N)
 
 -- Types

@@ -66,7 +66,22 @@ typeOf γ t@(OneOf ϕ ψ e) = case e of
               ++ show ϕ
               ++ ", given: "
               ++ show (typeOf γ m)
-
+-- Γ ⊢ M: ϕ ∧ ψ
+----------------
+-- Γ ⊢ π₁(M): ϕ
+typeOf γ t@(Fst m) = case typeOf γ m of
+  (And ϕ ψ) -> ϕ
+  _ ->
+    error $
+      "type check: projecting a non-product type " ++ show t ++ "\n"
+        ++ "gien: "
+        ++ show (typeOf γ m)
+-- Γ ⊢ M: ϕ ∧ ψ
+----------------
+-- Γ ⊢ π₂(M): ψ
+typeOf γ t@(Snd m) = case typeOf γ m of
+  (And ϕ ψ) -> ψ
+  _ -> error $ "type check: projecting a non-product type " ++ show t
 -- Γ ⊢ L: ϕ ∨ ψ   Γ, x: ϕ ⊢ M: τ  Γ, y: ψ ⊢ N: τ
 -------------------------------------------------
 -- Γ ⊢ case(L;x.M;y.N) ⊢ τ

@@ -35,6 +35,10 @@ instance Substitute Term where
   sub y n (OneOf ϕ ψ o) = OneOf (sub y n ϕ) (sub y n ψ) $ case o of
     Left m -> Left $ sub y n m
     Right m -> Right $ sub y n m
+  -- π1(M)[N/y] = π1(M[N/y])
+  sub y n (Fst m) = Fst (sub y n m)
+  -- π2(M)[N/y] = π1(M[N/y])
+  sub y n (Snd m) = Snd (sub y n m)
   -- case(L;x.P;y.Q)[N/z] = case(L[N/z];(x.P)[N/z];(y.Q)[N/z])
   -- (x.M)[N/x] = (x.M)
   -- (x.M)[N/y] = (z.M[z/x][N/y]) w/ z ∉ FV(N) ∪ FV(M) if x ∈ FV(N)
