@@ -66,4 +66,5 @@ since p x = forany [x `is` p]
 
 suppose = forany
 
-because = suppose
+because :: [Term] -> TypedVar -> Term -> Term
+because reasons prop proof = suppose [prop] proof `instantiatedWith` reasons
