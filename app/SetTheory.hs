@@ -155,5 +155,29 @@ theorems =
               ]
               (forall ["x"] ("x" ∈ "A" --> "x" ∈ "B") `as` "subseting")
               (Term "itrp of subset" `instantiatedWith` [Term "A", Term "B", Term "subseting"])
+        ),
+    ("equality is symmetric" =:: forall ["A", "B"] ("A" === "B" --> "B" === "A"))
+      `proof` forany
+        ["A", "B"]
+        ( suppose
+            [("A" === "B") `as` "assumption"]
+            ( because
+                [ forany
+                    ["x"]
+                    ( because
+                        [Term "def of equality" `at` ["A", "B", "assumption", "x"]]
+                        ( (("x" ∈ "A" --> "x" ∈ "B") ∧ ("x" ∈ "B" --> "x" ∈ "A"))
+                            `as` "proof of A = B with x"
+                        )
+                        ( because
+                            [Snd (Term "proof of A = B with x") `Pair` Fst (Term "proof of A = B with x")]
+                            ((("x" ∈ "B" --> "x" ∈ "A") ∧ ("x" ∈ "A" --> "x" ∈ "B")) `as` "proof of B = A with x")
+                            (Term "proof of B = A with x")
+                        )
+                    )
+                ]
+                (forall ["x"] (("x" ∈ "B" --> "x" ∈ "A") ∧ ("x" ∈ "A" --> "x" ∈ "B")) `as` "proof of B = A")
+                (Term "itrp of equality" `at` ["B", "A", "proof of B = A"])
+            )
         )
   ]
