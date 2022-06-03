@@ -97,9 +97,9 @@ axioms =
     "def of subset"
       =:: forall
         ["A", "B"]
-        ("A" ⊂ "B" --> forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")),
+        ("A" ⊂ "B" --> forall ["x"] (("x" ∈ "A") --> ("x" ∈ "B"))),
     "itrp of subset"
       =:: forall
         ["A", "B"]
-        ("A" ⊂ "B" <-- forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B"))
+        ("A" ⊂ "B" <-- forall ["x"] (("x" ∈ "A") --> ("x" ∈ "B")))
   ]
