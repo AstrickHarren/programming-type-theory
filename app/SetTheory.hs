@@ -35,29 +35,9 @@ infixl 6 ===
 forall :: [Var] -> Type -> Type
 forall = Util.forall . map set
 
--- Axiomatic Defs
+infixr 1 =::
 
-equalDef =
-  forall ["A", "B"] $
-    "A" === "B"
-      --> forall
-        ["x"]
-        ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
-
-equalItrp =
-  forall ["A", "B"] $
-    "A" === "B"
-      <-- forall
-        ["x"]
-        ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
-
-subsetDef =
-  forall ["A", "B"] $
-    "A" ⊂ "B" --> forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")
-
-subsetItrp =
-  forall ["A", "B"] $
-    "A" ⊂ "B" <-- forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")
+(=::) = is
 
 -- Inductive Proving
 type Axiom = TypedVar
@@ -79,3 +59,31 @@ inductiveProof axioms theorems =
       )
       axioms
       theorems
+
+-- Axiomatic Defs
+axioms =
+  [ "def of equality"
+      =:: forall
+        ["A", "B"]
+        ( "A" === "B"
+            --> forall
+              ["x"]
+              ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
+        ),
+    "itrp of equality"
+      =:: forall
+        ["A", "B"]
+        ( "A" === "B"
+            --> forall
+              ["x"]
+              ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
+        ),
+    "def of subset"
+      =:: forall
+        ["A", "B"]
+        ("A" ⊂ "B" --> forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")),
+    "itrp of subset"
+      =:: forall
+        ["A", "B"]
+        ("A" ⊂ "B" <-- forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B"))
+  ]
