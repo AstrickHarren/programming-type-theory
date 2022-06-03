@@ -39,6 +39,16 @@ infixr 1 <--
 (<--) :: Type -> Type -> Type
 (<--) = isImpliedBy
 
+infixl 5 ∧
+
+(∧) :: Type -> Type -> Type
+(∧) = And
+
+infixl 5 ∨
+
+(∨) :: Type -> Type -> Type
+(∨) = Or
+
 iff :: Type -> Type -> Type
 iff a b = And (a `implies` b) (b `implies` a)
 
