@@ -1,5 +1,6 @@
 module SetTheory where
 
+import Data.List (mapAccumL)
 import Grammar
 import TypeCheck
 import Util hiding (forall)
@@ -57,3 +58,24 @@ subsetDef =
 subsetItrp =
   forall ["A", "B"] $
     "A" ⊂ "B" <-- forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")
+
+-- Inductive Proving
+type Axiom = TypedVar
+
+type Claim = TypedVar
+
+type Proof = Term
+
+type Theorem = (Claim, Proof)
+
+inductiveProof :: [Axiom] -> [Theorem] -> [Either String String]
+inductiveProof axioms theorems =
+  snd $
+    mapAccumL
+      ( \context (claim@(TypedVar name theorem), proof) ->
+          ( claim : context,
+            if typeOf context proof == theorem then Right name else Left name
+          )
+      )
+      axioms
+      theorems
