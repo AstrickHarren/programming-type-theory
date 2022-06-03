@@ -15,7 +15,10 @@ instance Show Type where
   show (Forall x@(TypedVar v σ) ϕ) =
     if v `member` fv ϕ
       then "∀" ++ show x ++ "." ++ show ϕ
-      else show σ ++ " -> " ++ show ϕ
+      else
+        (if length (show σ) > 1 then "(" ++ show σ ++ ")" else show σ)
+          ++ " -> "
+          ++ show ϕ
   show (And ϕ ψ) = "(" ++ show ϕ ++ ")" ++ "∧" ++ "(" ++ show ψ ++ ")"
   show (Or ϕ ψ) = "(" ++ show ϕ ++ ")" ++ "∨" ++ "(" ++ show ψ ++ ")"
 
