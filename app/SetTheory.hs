@@ -38,6 +38,9 @@ forall = Util.forall . map set
 -- overload `for any` as `for any sets`
 forany = Util.forany . map set
 
+proof :: Claim -> Proof -> Theorem
+proof = (,)
+
 infixr 1 =::
 
 (=::) = is
