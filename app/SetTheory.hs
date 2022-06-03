@@ -232,5 +232,13 @@ theorems =
               ]
               (forall ["x"] ("x" ∈ "A" --> "x" ∈ "C") `as` "proof of A ⊂ C")
               (Term "itrp of subset" `at` ["A", "C", "proof of A ⊂ C"])
+        ),
+    ("equality is reflexive" =:: forall ["A"] ("A" === "A"))
+      `proof` forany
+        ["A"]
+        ( because
+            [Term "subset is reflexive" `at` ["A"]]
+            (("A" ⊂ "A") `as` "A ⊂ A")
+            $ Term "two way subset implies equality" `instantiatedWith` [Term "A", Term "A", Term "A ⊂ A" `Pair` Term "A ⊂ A"]
         )
   ]
