@@ -65,3 +65,5 @@ since :: Type -> Var -> Term -> Term
 since p x = forany [x `is` p]
 
 suppose = forany
+
+because = suppose
