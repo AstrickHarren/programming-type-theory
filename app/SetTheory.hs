@@ -194,5 +194,43 @@ theorems =
                   [Term "equality implies subset" `at` ["B", "A", "B = A"]]
                   (("B" ⊂ "A") `as` "B ⊂ A")
                   (Term "A ⊂ B" `Pair` Term "B ⊂ A")
+        ),
+    ("subset is reflexive" =:: forall ["A"] ("A" ⊂ "A"))
+      `proof` forany
+        ["A"]
+        ( because
+            [ forany ["x"] $
+                suppose
+                  [("x" ∈ "A") `as` "x ∈ A"]
+                  $ Term "x ∈ A"
+            ]
+            (forall ["x"] (("x" ∈ "A") --> ("x" ∈ "A")) `as` "proof of reflexivity")
+            $ Term "itrp of subset" `at` ["A", "A", "proof of reflexivity"]
+        ),
+    ("subset is transitive" =:: forall ["A", "B", "C"] ((("A" ⊂ "B") ∧ ("B" ⊂ "C")) --> ("A" ⊂ "C")))
+      `proof` forany
+        ["A", "B", "C"]
+        ( suppose [(("A" ⊂ "B") ∧ ("B" ⊂ "C")) `as` "assumption"] $
+            because
+              [ forany ["x"] $
+                  because
+                    [Fst $ Term "assumption"]
+                    (("A" ⊂ "B") `as` "A ⊂ B")
+                    $ because
+                      [Snd $ Term "assumption"]
+                      (("B" ⊂ "C") `as` "B ⊂ C")
+                      $ because
+                        [Term "def of subset" `at` ["A", "B", "A ⊂ B", "x"]]
+                        (("x" ∈ "A" --> "x" ∈ "B") `as` "proof of A ⊂ B with x")
+                        $ because
+                          [Term "def of subset" `at` ["B", "C", "B ⊂ C", "x"]]
+                          (("x" ∈ "B" --> "x" ∈ "C") `as` "proof of B ⊂ C with x")
+                          $ suppose [("x" ∈ "A") `as` "x ∈ A"] $
+                            -- Replace `instantiatedWith` with better interface
+                            Term "proof of B ⊂ C with x"
+                              `instantiatedWith` [Term "proof of A ⊂ B with x" `at` ["x ∈ A"]]
+              ]
+              (forall ["x"] ("x" ∈ "A" --> "x" ∈ "C") `as` "proof of A ⊂ C")
+              (Term "itrp of subset" `at` ["A", "C", "proof of A ⊂ C"])
         )
   ]
