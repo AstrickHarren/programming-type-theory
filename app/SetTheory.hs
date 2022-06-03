@@ -179,5 +179,20 @@ theorems =
                 (forall ["x"] (("x" ∈ "B" --> "x" ∈ "A") ∧ ("x" ∈ "A" --> "x" ∈ "B")) `as` "proof of B = A")
                 (Term "itrp of equality" `at` ["B", "A", "proof of B = A"])
             )
+        ),
+    ("equality implies twoway subset" =:: forall ["A", "B"] ("A" === "B" --> ("A" ⊂ "B") ∧ ("B" ⊂ "A")))
+      `proof` forany
+        ["A", "B"]
+        ( suppose [("A" === "B") `as` "assumption"] $
+            because
+              [Term "equality implies subset" `at` ["A", "B", "assumption"]]
+              (("A" ⊂ "B") `as` "A ⊂ B")
+              $ because
+                [Term "equality is symmetric" `at` ["A", "B", "assumption"]]
+                (("B" === "A") `as` "B = A")
+                $ because
+                  [Term "equality implies subset" `at` ["B", "A", "B = A"]]
+                  (("B" ⊂ "A") `as` "B ⊂ A")
+                  (Term "A ⊂ B" `Pair` Term "B ⊂ A")
         )
   ]
