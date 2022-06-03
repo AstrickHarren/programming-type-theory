@@ -49,3 +49,11 @@ equalItrp =
       <-- forall
         ["x"]
         ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
+
+subsetDef =
+  forall ["A", "B"] $
+    "A" ⊂ "B" --> forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")
+
+subsetItrp =
+  forall ["A", "B"] $
+    "A" ⊂ "B" <-- forall ["x"] ("x" ∈ "A") --> ("x" ∈ "B")
