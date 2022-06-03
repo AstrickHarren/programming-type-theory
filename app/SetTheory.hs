@@ -35,6 +35,9 @@ infixl 6 ===
 forall :: [Var] -> Type -> Type
 forall = Util.forall . map set
 
+-- overload `for any` as `for any sets`
+forany = Util.forany . map set
+
 infixr 1 =::
 
 (=::) = is
@@ -59,6 +62,16 @@ inductiveProof axioms theorems =
       )
       axioms
       theorems
+
+whatDoesItActuallyProve :: [Axiom] -> [Theorem] -> [TypedVar]
+whatDoesItActuallyProve axioms thms =
+  snd $
+    mapAccumL
+      ( \context (claim@(TypedVar name thm), proof) ->
+          (claim : context, typeOf context proof `as` name)
+      )
+      axioms
+      thms
 
 -- Axiomatic Defs
 axioms =
