@@ -90,7 +90,7 @@ axioms =
       =:: forall
         ["A", "B"]
         ( "A" === "B"
-            --> forall
+            <-- forall
               ["x"]
               ((("x" ∈ "A") --> ("x" ∈ "B")) `And` (("x" ∈ "B") --> ("x" ∈ "A")))
         ),
