@@ -61,6 +61,9 @@ instantiatedWith :: Term -> [Term] -> Term
 -- instantiatedWith m (x : xs) = Applied (instantiatedWith m xs) x
 instantiatedWith = foldl Applied
 
+at :: Term -> [String] -> Term
+at = (. map Term) . instantiatedWith
+
 since :: Type -> Var -> Term -> Term
 since p x = forany [x `is` p]
 
