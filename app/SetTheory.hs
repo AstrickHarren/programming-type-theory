@@ -3,7 +3,7 @@ module SetTheory where
 import Data.List (mapAccumL)
 import Grammar
 import TypeCheck
-import Util hiding (forall)
+import Util hiding (forall, forany)
 import qualified Util
 
 --- Definitions
@@ -66,6 +66,8 @@ inductiveProof axioms theorems =
       axioms
       theorems
 
+verifyThms = inductiveProof axioms theorems
+
 whatDoesItActuallyProve :: [Axiom] -> [Theorem] -> [TypedVar]
 whatDoesItActuallyProve axioms thms =
   snd $
@@ -102,4 +104,56 @@ axioms =
       =:: forall
         ["A", "B"]
         ("A" ⊂ "B" <-- forall ["x"] (("x" ∈ "A") --> ("x" ∈ "B")))
+  ]
+
+-- Theorems
+
+theorems =
+  [ ( "two way subset implies equality"
+        =:: forall
+          ["A", "B"]
+          ((("A" ⊂ "B") `And` ("B" ⊂ "A")) --> ("A" === "B"))
+    )
+      `proof` forany
+        ["A", "B"]
+        ( suppose
+            [("A" ⊂ "B" ∧ "B" ⊂ "A") `as` "assumption"]
+            $ because
+              [ forany
+                  ["x"]
+                  ( because
+                      [Fst $ Term "assumption"]
+                      (("A" ⊂ "B") `as` "A ⊂ B")
+                      ( because
+                          [Term "def of subset" `instantiatedWith` [Term "A", Term "B", Term "A ⊂ B", Term "x"]]
+                          ((("x" ∈ "A") --> ("x" ∈ "B")) `as` "equality left")
+                          ( because
+                              [Snd $ Term "assumption"]
+                              (("B" ⊂ "A") `as` "B ⊂ A")
+                              ( because
+                                  [Term "def of subset" `instantiatedWith` [Term "B", Term "A", Term "B ⊂ A", Term "x"]]
+                                  ((("x" ∈ "B") --> ("x" ∈ "A")) `as` "equality right")
+                                  (Term "equality left" `Pair` Term "equality right")
+                              )
+                          )
+                      )
+                  )
+              ]
+              (forall ["x"] ((("x" ∈ "A") --> ("x" ∈ "B")) ∧ (("x" ∈ "B") --> ("x" ∈ "A"))) `as` "equality")
+              (Term "itrp of equality" `instantiatedWith` [Term "A", Term "B", Term "equality"])
+        ),
+    ("equality implies subset" =:: forall ["A", "B"] (("A" === "B") --> ("A" ⊂ "B")))
+      `proof` forany
+        ["A", "B"]
+        ( suppose [("A" === "B") `as` "assumption"] $
+            because
+              [ forany ["x"] $
+                  because
+                    [Fst $ Term "def of equality" `instantiatedWith` [Term "A", Term "B", Term "assumption", Term "x"]]
+                    ((("x" ∈ "A") --> ("x" ∈ "B")) `as` "subseting(x)")
+                    (Term "subseting(x)")
+              ]
+              (forall ["x"] ("x" ∈ "A" --> "x" ∈ "B") `as` "subseting")
+              (Term "itrp of subset" `instantiatedWith` [Term "A", Term "B", Term "subseting"])
+        )
   ]
