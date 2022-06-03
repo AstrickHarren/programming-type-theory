@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Move brackets to avoid $" #-}
 module SetTheory where
 
 import Data.List (mapAccumL)
@@ -240,5 +243,36 @@ theorems =
             [Term "subset is reflexive" `at` ["A"]]
             (("A" ⊂ "A") `as` "A ⊂ A")
             $ Term "two way subset implies equality" `instantiatedWith` [Term "A", Term "A", Term "A ⊂ A" `Pair` Term "A ⊂ A"]
-        )
+        ),
+    ("equality is transitive" =:: forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("A" === "C")))
+      `proof` ( because
+                  [ forany ["A", "B", "C"] $
+                      suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                        because [Fst $ Term "assumption"] (("A" === "B") `as` "A = B") $
+                          because [Snd $ Term "assumption"] (("B" === "C") `as` "B = C") $
+                            because [Term "equality implies subset" `at` ["A", "B", "A = B"]] (("A" ⊂ "B") `as` "A ⊂ B") $
+                              because [Term "equality implies subset" `at` ["B", "C", "B = C"]] (("B" ⊂ "C") `as` "B ⊂ C") $
+                                Term "subset is transitive" `at` ["A", "B", "C"] `instantiatedWith` [Term "A ⊂ B" `Pair` Term "B ⊂ C"]
+                  ]
+                  (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("A" ⊂ "C")) `as` "forward proof")
+                  $ because
+                    [ forany ["A", "B", "C"] $
+                        suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                          because
+                            [ Term "equality is symmetric" `instantiatedWith` [Term "B", Term "C", Snd $ Term "assumption"]
+                                `Pair` (Term "equality is symmetric" `instantiatedWith` [Term "A", Term "B", Fst $ Term "assumption"])
+                            ]
+                            (("C" === "B" ∧ "B" === "A") `as` "symmetric assumption")
+                            (Term "forward proof" `at` ["C", "B", "A", "symmetric assumption"])
+                    ]
+                    (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("C" ⊂ "A")) `as` "backward proof")
+                    $ forany ["A", "B", "C"] $
+                      suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                        Term "two way subset implies equality"
+                          `instantiatedWith` [ Term "A",
+                                               Term "C",
+                                               Term "forward proof" `at` ["A", "B", "C", "assumption"]
+                                                 `Pair` (Term "backward proof" `at` ["A", "B", "C", "assumption"])
+                                             ]
+              )
   ]
