@@ -16,9 +16,15 @@ empty = Term "∅"
 
 equals a b = binaryType "=" (Term a) (Term b)
 
+equalsTerm = binaryType "="
+
 memberOf a b = binaryType "∈" (Term a) (Term b)
 
+memberOfTerm = binaryType "∈"
+
 subsetOf a b = binaryType "⊂" (Term a) (Term b)
+
+subsetOfTerm = binaryType "⊂"
 
 infixl 8 ∈
 
@@ -106,7 +112,17 @@ axioms =
     "itrp of subset"
       =:: forall
         ["A", "B"]
-        ("A" ⊂ "B" <-- forall ["x"] (("x" ∈ "A") --> ("x" ∈ "B")))
+        ("A" ⊂ "B" <-- forall ["x"] (("x" ∈ "A") --> ("x" ∈ "B"))),
+    "pair"
+      =:: forall ["x", "y"] (Type "S"),
+    "def of axiom of pair"
+      =:: forall
+        ["x", "y", "z"]
+        ((Term "z" `memberOfTerm` (Term "pair" `at` ["x", "y"])) --> ("z" === "x" ∨ "z" === "y")),
+    "itrp of axiom of pair"
+      =:: forall
+        ["x", "y", "z"]
+        ((Term "z" `memberOfTerm` (Term "pair" `at` ["x", "y"])) <-- ("z" === "x" ∨ "z" === "y"))
   ]
 
 -- Theorems
@@ -245,34 +261,91 @@ theorems =
             $ Term "two way subset implies equality" `instantiatedWith` [Term "A", Term "A", Term "A ⊂ A" `Pair` Term "A ⊂ A"]
         ),
     ("equality is transitive" =:: forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("A" === "C")))
-      `proof` ( because
-                  [ forany ["A", "B", "C"] $
-                      suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
-                        because [Fst $ Term "assumption"] (("A" === "B") `as` "A = B") $
-                          because [Snd $ Term "assumption"] (("B" === "C") `as` "B = C") $
-                            because [Term "equality implies subset" `at` ["A", "B", "A = B"]] (("A" ⊂ "B") `as` "A ⊂ B") $
-                              because [Term "equality implies subset" `at` ["B", "C", "B = C"]] (("B" ⊂ "C") `as` "B ⊂ C") $
-                                Term "subset is transitive" `at` ["A", "B", "C"] `instantiatedWith` [Term "A ⊂ B" `Pair` Term "B ⊂ C"]
-                  ]
-                  (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("A" ⊂ "C")) `as` "forward proof")
-                  $ because
-                    [ forany ["A", "B", "C"] $
-                        suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
-                          because
-                            [ Term "equality is symmetric" `instantiatedWith` [Term "B", Term "C", Snd $ Term "assumption"]
-                                `Pair` (Term "equality is symmetric" `instantiatedWith` [Term "A", Term "B", Fst $ Term "assumption"])
-                            ]
-                            (("C" === "B" ∧ "B" === "A") `as` "symmetric assumption")
-                            (Term "forward proof" `at` ["C", "B", "A", "symmetric assumption"])
+      `proof` because
+        [ forany ["A", "B", "C"] $
+            suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+              because [Fst $ Term "assumption"] (("A" === "B") `as` "A = B") $
+                because [Snd $ Term "assumption"] (("B" === "C") `as` "B = C") $
+                  because [Term "equality implies subset" `at` ["A", "B", "A = B"]] (("A" ⊂ "B") `as` "A ⊂ B") $
+                    because [Term "equality implies subset" `at` ["B", "C", "B = C"]] (("B" ⊂ "C") `as` "B ⊂ C") $
+                      Term "subset is transitive" `at` ["A", "B", "C"] `instantiatedWith` [Term "A ⊂ B" `Pair` Term "B ⊂ C"]
+        ]
+        (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("A" ⊂ "C")) `as` "forward proof")
+        ( because
+            [ forany ["A", "B", "C"] $
+                suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                  because
+                    [ Term "equality is symmetric" `instantiatedWith` [Term "B", Term "C", Snd $ Term "assumption"]
+                        `Pair` (Term "equality is symmetric" `instantiatedWith` [Term "A", Term "B", Fst $ Term "assumption"])
                     ]
-                    (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("C" ⊂ "A")) `as` "backward proof")
-                    $ forany ["A", "B", "C"] $
-                      suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                    (("C" === "B" ∧ "B" === "A") `as` "symmetric assumption")
+                    (Term "forward proof" `at` ["C", "B", "A", "symmetric assumption"])
+            ]
+            (forall ["A", "B", "C"] (("A" === "B" ∧ "B" === "C") --> ("C" ⊂ "A")) `as` "backward proof")
+            $ forany ["A", "B", "C"] $
+              suppose [("A" === "B" ∧ "B" === "C") `as` "assumption"] $
+                Term "two way subset implies equality"
+                  `instantiatedWith` [ Term "A",
+                                       Term "C",
+                                       Term "forward proof" `at` ["A", "B", "C", "assumption"]
+                                         `Pair` (Term "backward proof" `at` ["A", "B", "C", "assumption"])
+                                     ]
+        ),
+    ( "pair is well defined"
+        =:: forall
+          ["x", "y", "a", "b"]
+          ( ("x" === "a" ∧ "y" === "b")
+              --> (Term "pair" `at` ["x", "y"]) `equalsTerm` (Term "pair" `at` ["a", "b"])
+          )
+    )
+      `proof` ( because
+                  [ forany
+                      ["x", "y", "a", "b"]
+                      $ suppose [("x" === "a" ∧ "y" === "b") `as` "assumption"] $
+                        because [Fst $ Term "assumption"] (("x" === "a") `as` "x = a") $
+                          because [Snd $ Term "assumption"] (("y" === "b") `as` "y = b") $
+                            because
+                              [ forany ["z"] $
+                                  suppose [(Term "z" `memberOfTerm` (Term "pair" `at` ["x", "y"])) `as` "z ∈ {x, y}"] $
+                                    because
+                                      [Term "def of axiom of pair" `at` ["x", "y", "z", "z ∈ {x, y}"]]
+                                      (("z" === "x" ∨ "z" === "y") `as` "proof of z ∈ {x, y}")
+                                      $ because
+                                        [ Case
+                                            (Term "proof of z ∈ {x, y}")
+                                            ( "z = x",
+                                              because [Term "equality is transitive" `instantiatedWith` [Term "z", Term "x", Term "a", Term "z = x" `Pair` Term "x = a"]] (("z" === "a") `as` "z = a") $
+                                                OneOf ("z" === "a") ("z" === "b") (Left $ Term "z = a")
+                                            )
+                                            ( "z = y",
+                                              because [Term "equality is transitive" `instantiatedWith` [Term "z", Term "y", Term "b", Term "z = y" `Pair` Term "y = b"]] (("z" === "b") `as` "z = b") $
+                                                OneOf ("z" === "a") ("z" === "b") (Right $ Term "z = b")
+                                            )
+                                        ]
+                                        (("z" === "a" ∨ "z" === "b") `as` "proof of z ∈ {a, b}")
+                                        (Term "itrp of axiom of pair" `at` ["a", "b", "z", "proof of z ∈ {a, b}"])
+                              ]
+                              (forall ["z"] ((Term "z" `memberOfTerm` (Term "pair" `at` ["x", "y"])) --> (Term "z" `memberOfTerm` (Term "pair" `at` ["a", "b"]))) `as` "proof of {x, y} ⊂ {a, b}")
+                              (Term "itrp of subset" `instantiatedWith` [Term "pair" `at` ["x", "y"], Term "pair" `at` ["a", "b"], Term "proof of {x, y} ⊂ {a, b}"])
+                  ]
+                  (forall ["x", "y", "a", "b"] (("x" === "a" ∧ "y" === "b") --> Term "pair" `at` ["x", "y"] `subsetOfTerm` (Term "pair" `at` ["a", "b"])) `as` "forward proof")
+                  $ because
+                    [ forany ["x", "y", "a", "b"] $
+                        suppose [("x" === "a" ∧ "y" === "b") `as` "assumption"] $
+                          because [Fst $ Term "assumption"] (("x" === "a") `as` "x = a") $
+                            because [Snd $ Term "assumption"] (("y" === "b") `as` "y = b") $
+                              because [Term "equality is symmetric" `at` ["x", "a", "x = a"]] (("a" === "x") `as` "a = x") $
+                                because [Term "equality is symmetric" `at` ["y", "b", "y = b"]] (("b" === "y") `as` "b = y") $
+                                  Term "forward proof" `instantiatedWith` ((Term <$> ["a", "b", "x", "y"]) ++ [Term "a = x" `Pair` Term "b = y"])
+                    ]
+                    (forall ["x", "y", "a", "b"] (("x" === "a" ∧ "y" === "b") --> Term "pair" `at` ["a", "b"] `subsetOfTerm` (Term "pair" `at` ["x", "y"])) `as` "backward proof")
+                    $ forany ["x", "y", "a", "b"] $
+                      suppose [("x" === "a" ∧ "y" === "b") `as` "assumption"] $
                         Term "two way subset implies equality"
-                          `instantiatedWith` [ Term "A",
-                                               Term "C",
-                                               Term "forward proof" `at` ["A", "B", "C", "assumption"]
-                                                 `Pair` (Term "backward proof" `at` ["A", "B", "C", "assumption"])
+                          `instantiatedWith` [ Term "pair" `at` ["x", "y"],
+                                               Term "pair" `at` ["a", "b"],
+                                               Term "forward proof" `at` ["x", "y", "a", "b", "assumption"]
+                                                 `Pair` (Term "backward proof" `at` ["x", "y", "a", "b", "assumption"])
                                              ]
               )
   ]
