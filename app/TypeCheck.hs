@@ -88,7 +88,7 @@ typeOf γ t@(Snd m) = case typeOf γ m of
 typeOf γ t@(Case l (x, m) (y, n)) = case typeOf γ l of
   (Or ϕ ψ) ->
     let leftType = typeOf ((x `TypedVar` ϕ) : γ) m
-        rightType = typeOf ((y `TypedVar` ψ) : γ) m
+        rightType = typeOf ((y `TypedVar` ψ) : γ) n
      in if leftType == rightType
           then leftType
           else
